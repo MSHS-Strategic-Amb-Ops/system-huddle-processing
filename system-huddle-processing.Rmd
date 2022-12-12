@@ -332,6 +332,10 @@ scheduling_data <- scheduling_data %>%
           Appt.Made.Year = format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y"),
           Appt.Made.WeekNum = as.numeric(strftime(Appt.Made.DTTM, format = "%V")))
 
+
+path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+saveRDS(scheduling_data, paste0(path,"scheduling_data.rds"))
+
 # Missing Charges (Update when mater data is re-processed)
 business_days <- seq(date_start, date_end, by="days")[!is.weekend(seq(date_start, date_end, by="days"))]
 missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 or 3?
@@ -372,7 +376,6 @@ missing_exc_visitType <- read_excel("/nfs/data/Applications/Ambulatory/open_enco
 # Based on Metric % Encounters Closed within 7 days
 # Missing Charges Trending by Site
 missing_chg_data_trend <- scheduling_data %>%
-  filter(Appt.Year == 2022) %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
   filter(Appt.DateYear <= missing_chg_cutOff) %>%
@@ -395,7 +398,7 @@ missing_chg_data_trend <- scheduling_data %>%
   filter(enc.status == "CLOSED")
 
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(missing_chg_data_trend, paste0(path,"historical_data.rds"))
+saveRDS(missing_chg_data_trend, paste0(path,"missing_chg_data_trend.rds"))
 
 ```
 
@@ -427,6 +430,6 @@ missing_chg_data_trend_downtown <- scheduling_data %>%
   filter(enc.status == "CLOSED")
 
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(missing_chg_data_trend_downtown, paste0(path,"historical_data.rds"))
+saveRDS(missing_chg_data_trend_downtown, paste0(path,"missing_chg_data_trend_downtown.rds"))
 
 ```
