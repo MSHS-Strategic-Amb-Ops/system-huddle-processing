@@ -330,7 +330,7 @@ saveRDS(missing_chg_data_trend, paste0(path,"missing_chg_data_trend.rds"))
 
 ```{r Open Encounters Metric Trending Summarized, fig.width=12, fig.height = 5, fig.align = 'center', echo = FALSE, warning = FALSE, message = FALSE}
 
-missing_chg_data_trend_downtown <- scheduling_data %>%
+missing_chg_data_trend_downtown <- scheduling_data_raw %>%
    filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
   filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
   filter(Appt.Status == "Arrived") %>%
