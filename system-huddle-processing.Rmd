@@ -1,0 +1,432 @@
+---
+output:
+  html_document:
+    toc: yes
+    toc_depth: 6
+    toc_float:
+      collapsed: yes
+    fig_width: 7
+    fig_height: 6
+resource_files:
+- hh_crosswalk.csv
+- Rad_Onc_Data.csv
+- Radiology_Data.csv
+- Radiology_Site_Mapping.csv
+- Epic Department Mapping Correction.csv
+- hh_crosswalk.csv
+- Radiology_Data.csv
+- Rad_Onc_Data.csv
+- Radiology_Site_Mapping.csv
+- Epic Department Mapping Correction.csv
+- open_encounters_exclusion.xlsx
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+<style type="text/css">
+div.main-container {
+  max-width: 2000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<style>
+.tocify {
+color: black;
+}
+<!-- } -->
+<!-- .tocify .tocify-header { -->
+<!--     position: fixed; -->
+<!--     <!-- top: 50px; --> -->
+<!--     left: 50px; -->
+<!--     width: 350px; -->
+<!--     <!-- border: solid 3px black; --> -->
+<!--     <!-- height: 200px; --> -->
+<!--  border: none; -->
+<!-- } -->
+.tocify .tocify-header .active {
+color: white;
+background: #d80b8c;
+font-weight: bold;
+}
+<!-- .tocify .tocify-item { -->
+<!-- background: white; -->
+<!-- color: black; -->
+<!--  border: none; -->
+<!-- } -->
+</style>
+<style>
+  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+     background-color: #212070;
+     }
+</style>
+<style>
+.container { width: 1800px; }
+h2 {
+  background-color: #dddedd;
+  color: black;
+  text-indent: 20px;
+  <!-- font-weight: bold; -->
+}
+h3 {
+  background-color: #f2f2f2;
+  color: black;
+  text-indent: 20px;
+  <!-- font-weight: bold; -->
+}
+h4 {
+  <!-- background-color: #dddedd; -->
+  <!-- color: black; -->
+  text-indent: 50px;
+  <!-- font-weight: bold; -->
+}
+</style>
+```{r Load Packages, echo = FALSE, warning = FALSE, message = FALSE}
+# Load packages -----------------------------------------------------------------------------------
+suppressMessages({
+  memory.limit(size = 10000000)
+  library(readxl)
+  library(writexl)
+  library(plyr)
+  library(dplyr)
+  library(data.table)
+  library(zoo)
+  library(shiny)
+  library(shinydashboard)
+  library(shinydashboardPlus)
+  library(shinyWidgets)
+  library(htmlwidgets)
+  library(lubridate)
+  library(tcltk)
+  library(tidyverse)
+  library(plotly)
+  library(knitr)
+  library(kableExtra)
+  library(leaflet)
+  library(grid)
+  library(gridExtra)
+  library(eeptools)
+  library(ggQC)
+  #library(zipcode)
+  library(utils)
+  library(scales)
+  library(chron)
+  library(bupaR)
+  library(shiny)
+  library(DT)
+  library(DiagrammeR)
+  library(shinyalert)
+  library(edeaR)
+  library(processmapR)
+  library(processmonitR)
+  library(processanimateR)
+  library(tidyr)
+  library(lubridate)
+  library(RColorBrewer)
+  library(DiagrammeR)
+  library(ggplot2)
+  library(leaflet)
+  library(readr)
+  library(highcharter)
+  library(ggforce) # for 'geom_arc_bar'
+  library(packcircles) # for packed circle graph
+  library(viridis)
+  library(ggiraph)
+  library(treemapify)
+  library(treemap)
+  library(broom)
+  library(extrafont)
+  library(tis) # for US holidays
+  library(vroom)
+  library(sjmisc)
+  library(tools)
+  library(here)
+  library(shinyBS)
+  library(shinyscreenshot)
+  library(fasttime)
+  library(shinycssloaders)
+  library(feather)
+  # library(zipcodeR)
+  library(formattable)
+  library(shinyjs)
+  library(janitor)
+  library(patchwork)
+  library(RODBC)
+  library(DBI)
+  library(odbc)
+})
+```
+
+
+```{r Graph asthetics, echo = FALSE, warning = FALSE, message = FALSE}
+### Color Functions for Graphs ============================================================
+# Mount Sinai corporate colors "USE THIS TO ADD COLORS"
+MountSinai_colors <- c(
+  `dark purple`  = "#212070",
+  `dark pink`    = "#d80b8c",
+  `dark blue`    = "#00aeef",
+  `dark grey`    = "#7f7f7f",
+  `yellow`       = "#ffc000",
+  `purple`       = "#7030a0",
+  `med purple`   = "#5753d0",
+  `med pink`     = "#f75dbe",
+  `med blue`     = "#5cd3ff",
+  `med grey`     = "#a5a7a5",
+  `light purple` = "#c7c6ef",
+  `light pink`   = "#fcc9e9",
+  `light blue`   = "#c9f0ff",
+  `light grey`   = "#dddedd"
+  )
+# Function to extract Mount Sinai colors as hex codes
+# Use Character names of MountSinai_colors
+MountSinai_cols <- function(...) {
+  cols <- c(...)
+  
+  if (is.null(cols))
+    return (MountSinai_colors)
+  
+  MountSinai_colors[cols]
+}
+# Color Function that can be used to call all colors is "MountSinai_cols()"
+# Use in ggplot 
+  #MountSinai_cols()       # will provide all colors and their hex codes in a table 
+  #MountSinai_cols("pink") # will provide color name and the hex code for the pink color
+# Create palettes 
+MountSinai_palettes <- list(
+  `all`   = MountSinai_cols("dark purple","dark pink","dark blue","dark grey",
+                            "med purple","med pink","med blue","med grey", 
+                            "light purple","light pink","light blue","light grey"),
+  
+  `main`  = MountSinai_cols("dark purple","dark pink","dark blue","dark grey"),
+  
+  `purple`  = MountSinai_cols("dark purple","med purple","light purple"),
+  
+  `pink`  = MountSinai_cols("dark pink","med pink","light pink"),
+  
+  `blue`  = MountSinai_cols("dark blue", "med blue", "light blue"),
+  
+  `grey`  = MountSinai_cols("dark grey", "med grey", "light grey"),
+  
+  `purpleGrey` = MountSinai_cols("dark purple", "dark grey"),
+  
+  `pinkBlue` = MountSinai_cols("dark pink", "dark blue")
+  
+)
+# MountSinai_palettes
+# Return function to interpolate a Mount Sinai color palette
+# default value is the main palette, reverse = True will change the order
+MountSinai_pal <- function(palette = "all", reverse = FALSE, ...) {
+  pal <- MountSinai_palettes[[palette]]
+  
+  if (reverse) pal <- rev(pal)
+  
+  colorRampPalette(pal, ...)
+}
+# Scale Function for ggplot can be used instead of scale_color_manual
+scale_color_MountSinai <- function(palette = "all", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- MountSinai_pal(palette = palette, reverse = reverse)
+  
+  if (discrete) {
+    discrete_scale("colour", paste0("MountSinai_", palette), palette = pal, ...)
+  } else {
+    scale_color_gradientn(colours = pal(256), ...)
+  }
+}
+# Scale Fill for ggplot insetead of scale_fill_manual 
+scale_fill_MountSinai <- function(palette = "all", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- MountSinai_pal(palette = palette, reverse = reverse)
+  if (discrete) {
+    discrete_scale("fill", paste0("MountSinai_", palette), palette = pal, ...)
+  } else {
+    scale_fill_gradientn(colours = pal(256), ...)
+  }
+}
+# Use in ggplot 
+  # scale_color_MountSinai("main")
+```
+
+
+```{r Import Data, echo = FALSE, warning = FALSE, message = FALSE}
+'%!in%' <- function(x,y)!('%in%'(x,y))
+inc_sites <- c("NETWORK","MSM","MSH-MSDFP","ONCOLOGY","MSW","MSBI","MSUS","MSH- AMBULATORY CARE","MSDD")
+
+
+scheduling_data_raw <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/historical_data.rds")) %>%
+  filter(!is.na(Campus)) %>%
+  filter(Campus %in% c("NETWORK","MSM","MSH-MSDFP","ONCOLOGY","MSW","MSBI","MSUS","MSH- AMBULATORY CARE","MSDD"))
+
+# scheduling_data_raw <- as.data.frame(readRDS(file.choose())) %>%
+#   filter(!is.na(Campus)) %>%
+#   filter(Campus %in% c("NETWORK","MSM","MSH-MSDFP","ONCOLOGY","MSW","MSBI","MSUS","MSH- AMBULATORY CARE","MSDD"))
+
+date_start <- as.Date("2021-01-01", format="%Y-%m-%d")
+date_end <- as.Date(max(scheduling_data_raw$Appt.Made.DTTM), format="%Y-%m-%d")
+# date_start <- as.Date(paste0(format(as.Date(date_end) - 365, "%Y-%m"),"-01"), format="%Y-%m-%d")
+```
+
+```{r Set Variables, echo = FALSE, warning = FALSE, message = FALSE}
+# Set up crosswalk for Week Number and Week Starting Date (Monday)
+# weekNum_monday <- scheduling_data_raw %>%
+#   filter(Appt.DateYear >= date_start, Appt.DateYear <= date_end) %>%
+#   filter(Appt.Day == "Mon") %>%
+#   mutate(Appt.WeekNum = as.numeric(strftime(Appt.DateYear, format = "%V"))) %>%
+#   select(Appt.Year, Appt.WeekNum, Appt.Day, Appt.DateYear) %>%
+#   distinct() %>%
+#   arrange(Appt.DateYear)
+# # weekNum_monday <- tail(weekNum_monday, 58)
+#
+# # Set Variables
+# report_run_date <- Sys.time()
+#
+# todays_date <- (tail(weekNum_monday,1))$Appt.DateYear
+# todays_year <- strftime(todays_date, format = "%Y")
+# todays_week <- as.numeric(strftime(todays_date, format = "%V"))
+# past_4_wks <- tail(weekNum_monday, 4)
+# past_5_wks <- tail(weekNum_monday, 5)
+# past_year <- weekNum_monday %>%
+#   filter(Appt.WeekNum %in% unique(past_5_wks$Appt.WeekNum))
+#
+# reporting_week <- as.Date(paste(todays_year, todays_week, 1, sep="-"), "%Y-%U-%u")
+weekNum_sunday <- scheduling_data_raw %>%
+  filter(Appt.DateYear >= date_start, Appt.DateYear <= date_end) %>%
+  filter(Appt.Day == "Sun") %>%
+  mutate(Appt.WeekNum = lubridate::epiweek(Appt.DateYear)) %>%
+  dplyr::select(Appt.Year, Appt.WeekNum, Appt.Day, Appt.DateYear) %>%
+  distinct() %>%
+  arrange(Appt.DateYear)
+# weekNum_sunday <- head(weekNum_sunday, -1)
+# Set Variables
+report_run_date <- Sys.Date()
+todays_date <- (tail(weekNum_sunday,1))$Appt.DateYear
+todays_year <- strftime(todays_date, format = "%Y")
+todays_week <- (tail(weekNum_sunday,1))$Appt.DateYear
+past_4_wks <- tail(weekNum_sunday, 4)
+past_5_wks <- tail(weekNum_sunday, 5)
+past_year <- weekNum_sunday %>%
+  filter(Appt.WeekNum %in% unique(past_5_wks$Appt.WeekNum))
+reporting_week <- paste0("from Sunday, ",todays_date, " to Saturday, ",todays_date+6)
+```
+
+
+```{r Data Processing, echo = FALSE, warning = FALSE, message = FALSE}
+# Scheduling Data
+scheduling_data <- scheduling_data_raw %>%
+  filter(!Campus %in% c("MSB", "MS NOW", "MSHP", "NYEE", "MSQ","OTHER","INPATIENT")) %>%
+  filter(!is.na(Campus))
+  
+rm(scheduling_data_raw)
+invisible(gc())
+
+scheduling_data <- scheduling_data %>%
+  mutate(Appt.WeekNum = lubridate::epiweek(Appt.DateYear),
+         Visit.Method  = case_when(Visit.Method == "IN PERSON" ~ 'IN PERSON',TRUE ~ 'TELEHEALTH'),
+         New.PT2 = case_when(New.PT2 == "New" ~ 'New', TRUE ~ 'Established'),
+         New.PT3 = case_when(New.PT3 == "TRUE" ~ 'New',TRUE ~ 'Established'),
+         enc.status = case_when(ENC_CLOSED_CHARGE_STATUS %in% c("OPEN", "CLOSED BUT COSIGN NEEDED") ~ 'OPEN',TRUE ~ 'CLOSED'),
+         open.hours = ifelse(enc.status == "OPEN",
+                             as.numeric(round(difftime(max(date_end)+1, Appt.DTTM, units = "hours"))),
+                             as.numeric(round(difftime(Y_ENC_CLOSE_TIME, Appt.DTTM, units = "hours")))),
+         open.days = round(open.hours/24)) %>%
+   mutate(Appt.Made.DateYear = as.Date(Appt.Made.DTTM, format="%Y-%m-%d"),
+          Appt.Made.MonthYear = format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y-%m"),
+          Appt.Made.Year = format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y"),
+          Appt.Made.WeekNum = as.numeric(strftime(Appt.Made.DTTM, format = "%V")))
+
+# Missing Charges (Update when mater data is re-processed)
+business_days <- seq(date_start, date_end, by="days")[!is.weekend(seq(date_start, date_end, by="days"))]
+missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 or 3?
+```
+
+
+```{r Epic Department Mapping Processing, echo = FALSE, warning = FALSE, message = FALSE}
+epic_depts <- scheduling_data %>%
+  group_by(Campus, Campus.Specialty, Department) %>%
+  summarise(total = n()) %>%
+  dplyr::select(-total) %>%
+  arrange(Campus, Campus.Specialty, Department)
+epic_depts_site <- function(site){
+
+  epic_depts %>%
+    filter(Campus == site) %>%
+    select(everything()) %>%
+    kable(escape = F, align = "l") %>%
+    kable_styling(bootstrap_options = "hover", full_width = FALSE, position = "center", row_label_position = "c", font_size = 14) %>%
+    add_header_above(c("Epic Department Mapping" = length(epic_depts)),
+                     background = "#221f72", color = "white", font_size = 14) %>%
+    column_spec(1:2, width = "300px") %>%
+    collapse_rows(1:2, valign="top")
+}
+```
+
+
+```{r Open Encounters Metric Trending by Site, fig.width=12, fig.height = 5, fig.align = 'center', echo = FALSE, warning = FALSE, message = FALSE}
+site_cols <- c("#212070","#d80b8c","#00aeef","#7f7f7f","#ffc000","#7030a0","#c7c6ef","#fcc9e9","#c9f0ff","#dddedd")
+# Import in exclusion criteria
+# Exclude ECHO encounters
+missing_exc_dept <- read_excel("/nfs/data/Applications/Ambulatory/open_encounters_exclusion_dept.xlsx")
+missing_exc_resource <- read_excel("/nfs/data/Applications/Ambulatory/open_encounters_exclusion_res.xlsx")
+missing_exc_visitType <- read_excel("/nfs/data/Applications/Ambulatory/open_encounters_exclusion_visit.xlsx")
+# missing_exc_dept <- read_excel("C:/Users/kweons01/Desktop/Strategic Initiatives - So Youn/Github/server-upload/open_encounters_exclusion_dept.xlsx")
+# missing_exc_resource <- read_excel("C:/Users/kweons01/Desktop/Strategic Initiatives - So Youn/Github/server-upload/open_encounters_exclusion_res.xlsx")
+# missing_exc_visitType <- read_excel("C:/Users/kweons01/Desktop/Strategic Initiatives - So Youn/Github/server-upload/open_encounters_exclusion_visit.xlsx")
+# Based on Metric % Encounters Closed within 7 days
+# Missing Charges Trending by Site
+missing_chg_data_trend <- scheduling_data %>%
+  filter(Appt.Year == 2022) %>%
+  filter(Appt.Status == "Arrived") %>%
+  filter(Resource == "Provider") %>%
+  filter(Appt.DateYear <= missing_chg_cutOff) %>%
+   mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
+  # filter(Appt.DateYear >= as.Date("2021-06-01", "%Y-%m-%d")) %>%
+  filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
+  filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
+  mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
+                                         ,TRUE ~ "NO")) %>%
+  filter(visit_exclude == "NO") %>%
+  # filter(enc.status == "CLOSED") %>%
+  group_by(Campus, Appt.MonthYear, enc.status, clo.7days) %>%
+  summarise(total = n()) %>%
+   group_by(Campus, Appt.MonthYear) %>%
+  mutate(total.enc = sum(total)) %>%
+  pivot_wider(names_from = clo.7days,
+              values_from = total,
+              values_fill = 0) %>%
+  mutate(clo.7days.perc = round((YES/(total.enc))*100,0)) %>%
+  filter(enc.status == "CLOSED")
+
+path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+saveRDS(missing_chg_data_trend, paste0(path,"historical_data.rds"))
+
+```
+
+
+```{r Open Encounters Metric Trending Summarized, fig.width=12, fig.height = 5, fig.align = 'center', echo = FALSE, warning = FALSE, message = FALSE}
+
+missing_chg_data_trend_downtown <- scheduling_data %>%
+   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
+  filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
+  filter(Appt.Status == "Arrived") %>%
+  filter(Resource == "Provider") %>%
+  mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
+                                         ,TRUE ~ "NO")) %>%
+  filter(visit_exclude == "NO") %>%
+  filter(Campus %in% c("MSUS","MSDD","MSBI")) %>%
+  mutate(Campus = "MS Downtown") %>%
+  filter(Appt.DateYear >= date_start, Appt.DateYear <= missing_chg_cutOff) %>%
+  # filter(Appt.DateYear <= missing_chg_cutOff) %>%
+  # filter(enc.status == "CLOSED") %>%
+  mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
+  group_by(Campus, Appt.MonthYear, enc.status, clo.7days) %>%
+  summarise(total = n()) %>%
+   group_by(Campus, Appt.MonthYear) %>%
+  mutate(total.enc = sum(total)) %>%
+  pivot_wider(names_from = clo.7days,
+              values_from = total,
+              values_fill = 0) %>%
+  mutate(clo.7days.perc = round((YES/(total.enc))*100,0)) %>%
+  filter(enc.status == "CLOSED")
+
+path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+saveRDS(missing_chg_data_trend_downtown, paste0(path,"historical_data.rds"))
+
+```
