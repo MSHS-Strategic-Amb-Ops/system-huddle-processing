@@ -325,6 +325,10 @@ missing_chg_data_trend <- scheduling_data_raw %>%
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
 saveRDS(missing_chg_data_trend, paste0(path,"missing_chg_data_trend.rds"))
 
+rm(missing_chg_data_trend)
+
+invisible(gc())
+
 ```
 
 
