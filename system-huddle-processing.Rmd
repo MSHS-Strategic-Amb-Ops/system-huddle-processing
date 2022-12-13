@@ -362,3 +362,23 @@ path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
 saveRDS(missing_chg_data_trend_downtown, paste0(path,"missing_chg_data_trend_downtown.rds"))
 
 ```
+
+
+```{r MSHS Unlocked Notes Metrics, echo = FALSE, warning = FALSE, message = FALSE}
+
+missing_ytd_data <- scheduling_data_raw %>%
+  filter(Appt.Status == "Arrived") %>%
+  filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
+  filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
+  filter(Appt.DateYear <= missing_chg_cutOff) %>%
+  filter(Resource == "Provider") %>%
+  mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
+                                         ,TRUE ~ "NO")) %>%
+  filter(visit_exclude == "NO")
+
+path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+saveRDS(missing_ytd_data, paste0(path,"missing_ytd_data.rds"))
+
+```
+
+
