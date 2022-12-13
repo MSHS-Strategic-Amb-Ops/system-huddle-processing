@@ -361,6 +361,7 @@ missing_chg_data_trend_downtown <- scheduling_data_raw %>%
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
 saveRDS(missing_chg_data_trend_downtown, paste0(path,"missing_chg_data_trend_downtown.rds"))
 
+rm(missing_chg_data_trend_downtown)
 ```
 
 
@@ -379,6 +380,7 @@ missing_ytd_data <- scheduling_data_raw %>%
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
 saveRDS(missing_ytd_data, paste0(path,"missing_ytd_data.rds"))
 
+rm(missing_ytd_data)
 ```
 
 
