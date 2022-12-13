@@ -398,7 +398,7 @@ time_to_appt_all <- scheduling_data_raw %>%
   mutate(Wait.Time = as.numeric(Wait.Time))
 
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(mtime_to_appt_all, paste0(path,"time_to_appt_all.rds"))
+saveRDS(time_to_appt_all, paste0(path,"time_to_appt_all.rds"))
 
 ```
 
