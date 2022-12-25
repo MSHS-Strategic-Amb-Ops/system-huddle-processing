@@ -283,8 +283,8 @@ scheduling_data_raw <- scheduling_data_raw %>%
 ```{r Data Processing, echo = FALSE, warning = FALSE, message = FALSE}
 
 # Missing Charges (Update when mater data is re-processed)
-business_days <- seq(date_start, date_end, by="days")[!is.weekend(seq(date_start, date_end, by="days"))]
-missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 or 3?
+# business_days <- seq(date_start, date_end, by="days")[!is.weekend(seq(date_start, date_end, by="days"))]
+# missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 or 3?
 ```
 
 
@@ -386,14 +386,16 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 
 ```{r MSHS Time to Appointment Metrics by Site, echo = FALSE, warning = FALSE, message = FALSE}
 
+invisible(gc())
+
 time_to_appt_all <- scheduling_data_raw %>%
   filter(Campus != "MSBI") %>%
+  filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
   filter(Appt.Made.DateYear >= date_start, Appt.Made.DateYear <= date_end) %>%
   # filter(New.PT2 == "New") %>%
   # mutate(Appt.Made.Year = format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y"),
   #        Appt.Made.MonthYear = as.Date(paste0(format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y-%m"), "-01"))) %>%
   # filter(Appt.Made.Year >= 2021) %>%
-  filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
   filter(Wait.Time >= 0) %>%
   mutate(Wait.Time = as.numeric(Wait.Time))
 
