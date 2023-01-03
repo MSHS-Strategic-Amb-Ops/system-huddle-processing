@@ -406,7 +406,7 @@ site_cols <- c("#212070","#d80b8c","#00aeef","#7f7f7f","#ffc000","#7030a0","#c7c
 
 
 ```{r New Patient Volume Trending by Site, echo = FALSE, warning = FALSE, message = FALSE}
-new_vol_trending <- scheduling_data %>%
+new_vol_trending <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear <= date_end) %>%
@@ -428,7 +428,7 @@ rm(new_vol_trending)
 
 
 ```{r New Patient Volume Trending Summarized, echo = FALSE, warning = FALSE, message = FALSE}
-new_vol_trending_downtown <- scheduling_data %>%
+new_vol_trending_downtown <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Campus %in% c("MSUS","MSDD","MSBI")) %>%
   mutate(Campus = "MS Downtown") %>%
