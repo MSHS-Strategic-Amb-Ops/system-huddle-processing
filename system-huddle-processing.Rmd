@@ -420,7 +420,7 @@ new_vol_trending <- scheduling_data_raw %>%
          new_perc = round((New/(total_vol))*100,0))
 
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(missing_ytd_data, paste0(path,"new_vol_trending.rds"))
+saveRDS(new_vol_trending, paste0(path,"new_vol_trending.rds"))
 
 rm(new_vol_trending)
 
@@ -444,7 +444,7 @@ new_vol_trending_downtown <- scheduling_data_raw %>%
          new_perc = round((New/(total_vol))*100,0))
 
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(missing_ytd_data, paste0(path,"new_vol_trending_downtown.rds"))
+saveRDS(new_vol_trending_downtown, paste0(path,"new_vol_trending_downtown.rds"))
 
 rm(new_vol_trending_downtown)
 
