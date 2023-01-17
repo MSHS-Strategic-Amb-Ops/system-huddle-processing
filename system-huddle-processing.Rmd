@@ -259,8 +259,9 @@ scheduling_data_raw <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/
 #   filter(!is.na(Campus)) %>%
 #   filter(Campus %in% c("NETWORK","MSM","MSH-MSDFP","ONCOLOGY","MSW","MSBI","MSUS","MSH- AMBULATORY CARE","MSDD"))
 
-date_start <- as.Date("2022-01-01", format="%Y-%m-%d")
-date_end <- as.Date(max(scheduling_data_raw$Appt.Made.DTTM), format="%Y-%m-%d")
+date_start <- as.Date("2021-01-01", format="%Y-%m-%d")
+date_end <- as.Date("2022-12-31", format="%Y-%m-%d")
+# date_end <- as.Date(max(scheduling_data_raw$Appt.Made.DTTM), format="%Y-%m-%d")
 # date_start <- as.Date(paste0(format(as.Date(date_end) - 365, "%Y-%m"),"-01"), format="%Y-%m-%d")
 
 scheduling_data_raw <- scheduling_data_raw %>%
@@ -303,7 +304,8 @@ missing_exc_visitType <- read_excel("/nfs/data/Applications/Ambulatory/open_enco
 missing_chg_data_trend <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
-  filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
+  filter(Appt.Year == 2022) %>%
+  # filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
    mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
   # filter(Appt.DateYear >= as.Date("2022-06-01", "%Y-%m-%d")) %>%
   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
@@ -336,7 +338,8 @@ invisible(gc())
 missing_chg_data_trend_downtown <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
-  filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
+  filter(Appt.Year == 2022) %>%
+  # filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
   filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
   mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
@@ -371,7 +374,8 @@ missing_ytd_data <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
   filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
-  filter(Appt.DateYear <= missing_chg_cutOff) %>%
+  filter(Appt.Year == 2022) %>%
+  # filter(Appt.DateYear <= missing_chg_cutOff) %>%
   filter(Resource == "Provider") %>%
   mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
                                          ,TRUE ~ "NO")) %>%
@@ -392,7 +396,8 @@ invisible(gc())
 time_to_appt_all <- scheduling_data_raw %>%
   filter(Campus != "MSBI") %>%
   filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
-  filter(Appt.Made.DateYear >= date_start, Appt.Made.DateYear <= date_end) %>%
+  filter(Appt.Made.Year == 2022) %>%
+  # filter(Appt.Made.DateYear >= date_start, Appt.Made.DateYear <= date_end) %>%
   # filter(New.PT2 == "New") %>%
   # mutate(Appt.Made.Year = format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y"),
   #        Appt.Made.MonthYear = as.Date(paste0(format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y-%m"), "-01"))) %>%
@@ -411,7 +416,7 @@ invisible(gc())
 ```{r New Patient Volume Trending by Site, echo = FALSE, warning = FALSE, message = FALSE}
 new_vol_trending <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
-  filter(Appt.Year == 2023) %>%
+  filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear <= date_end) %>%
   # filter(Appt.DateYear >= date_start, Appt.DateYear <= date_end) %>%
   # mutate(New.PT2 = ifelse(New.PT2 == "",FALSE,New.PT2)) %>%
@@ -436,7 +441,7 @@ new_vol_trending_downtown <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Campus %in% c("MSUS","MSDD","MSBI")) %>%
   mutate(Campus = "MS Downtown") %>%
-  filter(Appt.Year == 2023) %>%
+  filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear <= date_end) %>%
   # filter(Appt.DateYear >= date_start, Appt.DateYear <= date_end) %>%
   # mutate(New.PT2 = ifelse(New.PT2 == "",FALSE,New.PT2)) %>%
