@@ -304,6 +304,7 @@ missing_exc_visitType <- read_excel("/nfs/data/Applications/Ambulatory/open_enco
 missing_chg_data_trend <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
+  filter(Appt.Year %in% c(2023,2022)) %>%
   # filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
    mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
@@ -338,6 +339,7 @@ invisible(gc())
 missing_chg_data_trend_downtown <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
+  filter(Appt.Year %in% c(2023,2022)) %>%
   # filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
@@ -374,6 +376,7 @@ invisible(gc())
 missing_chg_data_trend_5days <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
+  filter(Appt.Year %in% c(2023,2022)) %>%
   # filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
    mutate(clo.5days = case_when(open.days <= 5 ~ 'YES', TRUE ~ 'NO')) %>%
@@ -408,6 +411,7 @@ invisible(gc())
 missing_chg_data_trend_downtown_5days <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
   filter(Resource == "Provider") %>%
+  filter(Appt.Year %in% c(2023,2022)) %>%
   # filter(Appt.Year == 2022) %>%
   filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
@@ -442,6 +446,7 @@ invisible(gc())
 
 missing_ytd_data <- scheduling_data_raw %>%
   filter(Appt.Status == "Arrived") %>%
+  filter(Appt.Year %in% c(2023,2022)) %>%
   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
   filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
   # filter(Appt.Year == 2022) %>%
