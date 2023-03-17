@@ -301,72 +301,72 @@ missing_exc_visitType <- read_excel("/nfs/data/Applications/Ambulatory/open_enco
 # missing_exc_visitType <- read_excel("C:/Users/kweons01/Desktop/Strategic Initiatives - So Youn/Github/server-upload/open_encounters_exclusion_visit.xlsx")
 # Based on Metric % Encounters Closed within 7 days
 # Missing Charges Trending by Site
-missing_chg_data_trend <- scheduling_data_raw %>%
-  filter(Appt.Status == "Arrived") %>%
-  filter(Resource == "Provider") %>%
-  filter(Appt.Year %in% c(2023,2022)) %>%
-  # filter(Appt.Year == 2022) %>%
-  filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
-   mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
-  # filter(Appt.DateYear >= as.Date("2022-06-01", "%Y-%m-%d")) %>%
-  filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
-  filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
-  mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
-                                         ,TRUE ~ "NO")) %>%
-  filter(visit_exclude == "NO") %>%
-  # filter(enc.status == "CLOSED") %>%
-  group_by(Campus, Appt.MonthYear, enc.status, clo.7days) %>%
-  summarise(total = n()) %>%
-   group_by(Campus, Appt.MonthYear) %>%
-  mutate(total.enc = sum(total)) %>%
-  pivot_wider(names_from = clo.7days,
-              values_from = total,
-              values_fill = 0) %>%
-  mutate(clo.7days.perc = round((YES/(total.enc))*100,0)) %>%
-  filter(enc.status == "CLOSED")
-
-path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(missing_chg_data_trend, paste0(path,"missing_chg_data_trend.rds"))
-
-rm(missing_chg_data_trend)
-invisible(gc())
+# missing_chg_data_trend <- scheduling_data_raw %>%
+#   filter(Appt.Status == "Arrived") %>%
+#   filter(Resource == "Provider") %>%
+#   filter(Appt.Year %in% c(2023,2022)) %>%
+#   # filter(Appt.Year == 2022) %>%
+#   filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
+#    mutate(clo.5days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
+#   # filter(Appt.DateYear >= as.Date("2022-06-01", "%Y-%m-%d")) %>%
+#   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
+#   filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
+#   mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
+#                                          ,TRUE ~ "NO")) %>%
+#   filter(visit_exclude == "NO") %>%
+#   # filter(enc.status == "CLOSED") %>%
+#   group_by(Campus, Appt.MonthYear, enc.status, clo.7days) %>%
+#   summarise(total = n()) %>%
+#    group_by(Campus, Appt.MonthYear) %>%
+#   mutate(total.enc = sum(total)) %>%
+#   pivot_wider(names_from = clo.7days,
+#               values_from = total,
+#               values_fill = 0) %>%
+#   mutate(clo.7days.perc = round((YES/(total.enc))*100,0)) %>%
+#   filter(enc.status == "CLOSED")
+# 
+# path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+# saveRDS(missing_chg_data_trend, paste0(path,"missing_chg_data_trend.rds"))
+# 
+# rm(missing_chg_data_trend)
+# invisible(gc())
 
 ```
 
 
 ```{r Open Encounters Metric Trending Summarized, fig.width=12, fig.height = 5, fig.align = 'center', echo = FALSE, warning = FALSE, message = FALSE}
 
-missing_chg_data_trend_downtown <- scheduling_data_raw %>%
-  filter(Appt.Status == "Arrived") %>%
-  filter(Resource == "Provider") %>%
-  filter(Appt.Year %in% c(2023,2022)) %>%
-  # filter(Appt.Year == 2022) %>%
-  filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
-  filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
-  filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
-  mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
-                                         ,TRUE ~ "NO")) %>%
-  filter(visit_exclude == "NO") %>%
-  filter(Campus %in% c("MSUS","MSDD","MSBI")) %>%
-  mutate(Campus = "MS Downtown") %>%
-  # filter(Appt.DateYear <= missing_chg_cutOff) %>%
-  # filter(enc.status == "CLOSED") %>%
-  mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
-  group_by(Campus, Appt.MonthYear, enc.status, clo.7days) %>%
-  summarise(total = n()) %>%
-   group_by(Campus, Appt.MonthYear) %>%
-  mutate(total.enc = sum(total)) %>%
-  pivot_wider(names_from = clo.7days,
-              values_from = total,
-              values_fill = 0) %>%
-  mutate(clo.7days.perc = round((YES/(total.enc))*100,0)) %>%
-  filter(enc.status == "CLOSED")
-
-path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-saveRDS(missing_chg_data_trend_downtown, paste0(path,"missing_chg_data_trend_downtown.rds"))
-
-rm(missing_chg_data_trend_downtown)
-invisible(gc())
+# missing_chg_data_trend_downtown <- scheduling_data_raw %>%
+#   filter(Appt.Status == "Arrived") %>%
+#   filter(Resource == "Provider") %>%
+#   filter(Appt.Year %in% c(2023,2022)) %>%
+#   # filter(Appt.Year == 2022) %>%
+#   filter(Appt.DateYear >= date_start & Appt.DateYear <= missing_chg_cutOff) %>%
+#   filter(Department %!in% unique(missing_exc_dept$DEPARTMENT)) %>%
+#   filter(Provider %!in% unique(missing_exc_resource$PROVIDER)) %>%
+#   mutate(visit_exclude = case_when(str_detect(Appt.Type, "ECHO|SOCIAL|NURSE|NUTRITION|LAB|TREATMENT") ~ "YES"
+#                                          ,TRUE ~ "NO")) %>%
+#   filter(visit_exclude == "NO") %>%
+#   filter(Campus %in% c("MSUS","MSDD","MSBI")) %>%
+#   mutate(Campus = "MS Downtown") %>%
+#   # filter(Appt.DateYear <= missing_chg_cutOff) %>%
+#   # filter(enc.status == "CLOSED") %>%
+#   mutate(clo.7days = case_when(open.days <= 7 ~ 'YES', TRUE ~ 'NO')) %>%
+#   group_by(Campus, Appt.MonthYear, enc.status, clo.7days) %>%
+#   summarise(total = n()) %>%
+#    group_by(Campus, Appt.MonthYear) %>%
+#   mutate(total.enc = sum(total)) %>%
+#   pivot_wider(names_from = clo.7days,
+#               values_from = total,
+#               values_fill = 0) %>%
+#   mutate(clo.7days.perc = round((YES/(total.enc))*100,0)) %>%
+#   filter(enc.status == "CLOSED")
+# 
+# path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+# saveRDS(missing_chg_data_trend_downtown, paste0(path,"missing_chg_data_trend_downtown.rds"))
+# 
+# rm(missing_chg_data_trend_downtown)
+# invisible(gc())
 ```
 
 
