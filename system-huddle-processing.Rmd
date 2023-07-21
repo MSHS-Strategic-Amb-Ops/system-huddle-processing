@@ -254,6 +254,9 @@ inc_sites <- c("NETWORK","MSM","MSH-MSDFP","ONCOLOGY","MSW","MSBI","MSUS","MSH- 
 scheduling_data_raw <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/Data_Updated/historical_data.rds")) %>%
   filter(!is.na(Campus)) %>%
   mutate(Campus = case_when(Campus == "MSDD" ~ "MSDMG",
+                            TRUE ~ Campus),
+         Campus = case_when(Department %in% c("1176 5TH DUBIN MED ONC", "1176 5TH DUBIN SURG ONC") ~ "DUBIN",
+                            Department %in% c("1468 MADISON CANCER", "1470 MADISON CANCER CENTER") ~ "RTC",
                             TRUE ~ Campus)) %>%
   filter(Campus %in% c("NETWORK","MSM","MSH-MSDFP","MSW","MSBI","MSUS","MSH- AMBULATORY CARE","MSDMG")) 
 
@@ -486,6 +489,26 @@ path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
 saveRDS(time_to_appt_all, paste0(path,"time_to_appt_all.rds"))
 rm(time_to_appt_all)
 invisible(gc())
+
+
+new_perc_trend <- scheduling_data %>%
+  filter(Campus != "MSBI") %>%
+  filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
+  # filter(Appt.Made.Year == 2023) %>%
+  filter(Appt.Made.DateYear >= as.Date("2022-12-01") & Appt.DateYear <= date_end) %>%
+  # filter(Appt.Made.DateYear >= date_start, Appt.Made.DateYear <= date_end) %>%
+  filter(New.PT2 == "New") %>%
+  # mutate(Appt.Made.MonthYear = as.Date(paste0(format(as.Date(Appt.Made.DTTM, format="%m/%d/%Y"), "%Y-%m"), "-01"))) %>%
+  filter(Wait.Time >= 0) %>%
+  mutate(Wait.Time = as.numeric(Wait.Time)) %>%
+  mutate(within.14 = ifelse(Wait.Time <= 14, "Yes","No")) %>%
+  group_by(Campus, Appt.Made.MonthYear, within.14) %>%
+  summarise(count = n()) %>%
+  pivot_wider(names_from = within.14,
+              values_from = count,
+              values_fill = 0) %>%
+  mutate(total = Yes + No,
+         new_14days = round((Yes/(total))*100))
 
 ```
 
