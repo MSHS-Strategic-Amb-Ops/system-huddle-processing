@@ -491,7 +491,7 @@ rm(time_to_appt_all)
 invisible(gc())
 
 
-new_perc_trend <- scheduling_data %>%
+new_perc_trend <- scheduling_data_raw %>%
   filter(Campus != "MSBI") %>%
   filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
   # filter(Appt.Made.Year == 2023) %>%
