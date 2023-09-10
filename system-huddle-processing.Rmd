@@ -473,8 +473,16 @@ invisible(gc())
 
 invisible(gc())
 
+# Manually exclude departments from wait time access ---------------------------
+time_to_appt_dept_excl <- c("5 E 98TH ST PREOP", 
+                           "MSH CONDITION MANAGEMENT",
+                           "VISITING DOCS HOUSE CALL",
+                           "VISITING DOCTORS")
+
+
 time_to_appt_all <- scheduling_data_raw %>%
   filter(Campus != "MSBI") %>%
+  filter(Department %!in% time_to_appt_dept_excl) %>%
   filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
   # filter(Appt.Made.Year == 2022) %>%
   filter(Appt.Made.DateYear >= date_start, Appt.Made.DateYear <= date_end) %>%
@@ -493,6 +501,7 @@ invisible(gc())
 
 new_perc_trend <- scheduling_data_raw %>%
   filter(Campus != "MSBI") %>%
+  filter(Department %!in% time_to_appt_dept_excl) %>%
   filter(Campus.Specialty %in% c("Internal Medicine", "Family Medicine")) %>%
   # filter(Appt.Made.Year == 2023) %>%
   filter(Appt.Made.DateYear >= as.Date("2022-12-01") & Appt.DateYear <= date_end) %>%
