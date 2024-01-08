@@ -264,10 +264,11 @@ scheduling_data_raw <- as.data.frame(readRDS("/nfs/data/Applications/Ambulatory/
 #   filter(!is.na(Campus)) %>%
 #   filter(Campus %in% c("NETWORK","MSM","MSH-MSDFP","ONCOLOGY","MSW","MSBI","MSUS","MSH- AMBULATORY CARE","MSDD"))
 
-date_start <- as.Date("2021-01-01", format="%Y-%m-%d")
-# date_end <- as.Date("2022-12-31", format="%Y-%m-%d")
-date_end <- as.Date(max(scheduling_data_raw$Appt.Made.DTTM), format="%Y-%m-%d")
-# date_start <- as.Date(paste0(format(as.Date(date_end) - 365, "%Y-%m"),"-01"), format="%Y-%m-%d")
+date_start <- as.Date("2022-01-01", format="%Y-%m-%d")
+# date_end <- as.Date(max(scheduling_data_raw$Appt.Made.DTTM), format="%Y-%m-%d")
+date_end <- as.Date("2023-12-31", format="%Y-%m-%d")
+
+todays_year <- format(date_end, "%Y")
 
 scheduling_data_raw <- scheduling_data_raw %>%
   mutate(Appt.WeekNum = lubridate::epiweek(Appt.DateYear),
