@@ -519,6 +519,12 @@ new_perc_trend <- scheduling_data_raw %>%
   mutate(total = Yes + No,
          new_14days = round((Yes/(total))*100))
 
+
+path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
+saveRDS(new_perc_trend, paste0(path,"new_perc_trend.rds"))
+rm(new_perc_trend)
+invisible(gc())
+
 ```
 
 
