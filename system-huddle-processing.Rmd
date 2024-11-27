@@ -483,10 +483,10 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 ```{r Manual Run of HH Data, echo = FALSE, warning = FALSE, message = FALSE}
 
 path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
-# hh_data_comp_raw <<- read.csv("hand_hygiene_comp.csv")
-# write.csv(hh_data_comp_raw, paste0(path,"hh_data_comp_raw"), row.names = F)
+hh_data_comp_raw <<- read.csv("hand_hygiene_comp.csv")
+write.csv(hh_data_comp_raw, paste0(path,"hh_data_comp_raw.csv"), row.names = F)
 hh_data_comp_raw_pt_entry <<- read.csv("pt_hand_hygiene_comp.csv")
-write.csv(hh_data_comp_raw_pt_entry, paste0(path,"hh_data_comp_raw"), row.names = F)
+write.csv(hh_data_comp_raw_pt_entry, paste0(path,"hh_data_comp_raw.csv"), row.names = F)
 
 ```
 
