@@ -488,7 +488,7 @@ path <- "/nfs/data/Applications/Ambulatory/Data_Updated/"
 hh_data_comp_raw_pt_entry <<- read_excel("pt_hand_hygiene_comp.xlsx")
 # write.csv(hh_data_comp_raw_pt_entry, paste0(path,"hh_data_comp_raw.csv"), row.names = F)
 
-require(openxlsx)
-write.xlsx(hh_data_comp_raw_pt_entry, paste0(path,"hh_data_comp_raw.xlsx"))
+saveRDS(missing_ytd_data, paste0(path,"pt_hand_hygiene_comp.rds"))
+
 ```
 
