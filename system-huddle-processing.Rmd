@@ -327,25 +327,25 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 
 ```{r Scheduling Data Filtering, echo = FALSE, warning = FALSE, message = FALSE}
 
-scheduling_data <- access_raw_tbl %>%
-  dplyr::select(PAT_ENC_CSN_ID, CONTACT_DATE, APPT_STATUS_NAME,
-                DEPARTMENT_ID, DEPARTMENT_NAME, DEPT_SPECIALTY_NAME,
-                PROV_ID, PROV_NAME_WID, PRC_NAME, PRC_ID, APPT_MADE_DTTM,
-                APPT_MADE_DATE, APPT_BLOCK_NAME, APPT_DTTM,
-                APPT_CANC_DTTM, APPT_CANC_DATE,
-                EM_CODE_YN, PAT_NAME,
-                MRN, VISIT_GROUP_NUM,
-                FINCLASS, VISITPAYOR, VISITPLAN,
-                VISIT_PROV_STAFF_RESOURCE_C,
-                VISIT_TYPE,
-                NPI,
-                CAMPUS,
-                Y_COSIGN_MSG, Y_CHART_COSIGN_ID, COSIGN_NAME, Y_ENC_COSIGN_TIME, Y_ENC_CLOSE_TIME,
-                Y_ENC_OPEN_TIME,
-                COS_PROV_ID, COS_PROV_NAME,
-                ENC_CLOSED_CHARGE_STATUS, PRIMARY_DX_CODE, PRIMARY_DX_NAME, LOS_CODE,
-                LOS_NAME, DERIVED_STATUS_DESC, DEP_RPT_GRP_ELEVEN, DEP_RPT_GRP_SEVENTEEN,
-                SITE, VISIT_METHOD, VIS_NEW_TO_DEP_YN, VIS_NEW_TO_PROV_YN, SCHED_METHOD)
+# scheduling_data <- access_raw_tbl %>%
+#   dplyr::select(PAT_ENC_CSN_ID, CONTACT_DATE, APPT_STATUS_NAME,
+#                 DEPARTMENT_ID, DEPARTMENT_NAME, DEPT_SPECIALTY_NAME,
+#                 PROV_ID, PROV_NAME_WID, PRC_NAME, PRC_ID, APPT_MADE_DTTM,
+#                 APPT_MADE_DATE, APPT_BLOCK_NAME, APPT_DTTM,
+#                 APPT_CANC_DTTM, APPT_CANC_DATE,
+#                 EM_CODE_YN, PAT_NAME,
+#                 MRN, VISIT_GROUP_NUM,
+#                 FINCLASS, VISITPAYOR, VISITPLAN,
+#                 VISIT_PROV_STAFF_RESOURCE_C,
+#                 VISIT_TYPE,
+#                 NPI,
+#                 CAMPUS,
+#                 Y_COSIGN_MSG, Y_CHART_COSIGN_ID, COSIGN_NAME, Y_ENC_COSIGN_TIME, Y_ENC_CLOSE_TIME,
+#                 Y_ENC_OPEN_TIME,
+#                 COS_PROV_ID, COS_PROV_NAME,
+#                 ENC_CLOSED_CHARGE_STATUS, PRIMARY_DX_CODE, PRIMARY_DX_NAME, LOS_CODE,
+#                 LOS_NAME, DERIVED_STATUS_DESC, DEP_RPT_GRP_ELEVEN, DEP_RPT_GRP_SEVENTEEN,
+#                 SITE, VISIT_METHOD, VIS_NEW_TO_DEP_YN, VIS_NEW_TO_PROV_YN, SCHED_METHOD)
 
 ```
 
