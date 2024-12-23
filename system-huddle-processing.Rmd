@@ -284,6 +284,7 @@ missing_enc_visit_tbl <- tbl(conn1, "OPEN_ENC_EXCLUSION_VISIT")
 missing_enc_resource_tbl <- tbl(conn1, "OPEN_ENC_EXCLUSION_RESOURCE")
 hh_crosswalk_tbl <- tbl(conn1, "HH_CROSSWALK") 
 
+radiology_dep_mapping_tbl <- tbl(conn1, "RADIOLOGY_DEP_MAPPING")
 
 ```
 
@@ -352,7 +353,7 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 
 ```{r Scheduling Data Processing, echo = FALSE, warning = FALSE, message = FALSE}
 
-scheduling_data <- access_raw_tbl %>%
+scheduling_data <- tbl(conn1, "MV_DM_PATIENT_ACCESS") %>%
   left_join(radiology_dep_mapping_tbl %>% select(DEPARTMENT_ID, CLASS),
             by = c("DEPARTMENT_ID")) %>%
   mutate(radiology_check = ifelse((CLASS == "IP_OP" & PATIENT_CLASS %LIKE% '%INPATIENT%') | (CLASS == "IP_OP" & PATIENT_CLASS %LIKE% '%EMERGENCY%'), "Exclude", "Include")) %>%
