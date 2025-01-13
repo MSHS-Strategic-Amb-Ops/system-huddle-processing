@@ -300,10 +300,10 @@ radiology_dep_mapping_tbl <- tbl(conn1, "RADIOLOGY_DEP_MAPPING")
 
 report_run_date <- Sys.Date()
 
-todays_year <- year(Sys.Date())
-prior_year <- year(Sys.Date())-1
+todays_year <- year(Sys.Date())-1
+prior_year <- year(Sys.Date())-2
 
-date_start <- as.Date(paste0(year(Sys.Date())-1,"-01-01"))
+date_start <- as.Date(paste0(year(Sys.Date())-2,"-01-01"))
 
 # date_data <- access_raw_tbl %>%
 #   filter(DERIVED_STATUS_DESC == "Arrived") %>%
@@ -311,7 +311,7 @@ date_start <- as.Date(paste0(year(Sys.Date())-1,"-01-01"))
 #   summarise(total = n()) %>%
 #   collect()
 
-date_end <- as.Date(Sys.Date()-1)
+date_end <- as.Date(paste0(year(Sys.Date())-1,"-12-31"))
 
 date_start_formatted <- paste0(format(as.Date(date_start), "%Y-%m-%d"), " 00:00:00")
 date_end_formatted <- paste0(format(as.Date(date_end), "%Y-%m-%d"), " 00:00:00")
@@ -320,7 +320,7 @@ monthOptions <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","N
 
 # Missing Charges Date Cutoff ------------------
 business_days <- seq(date_start, date_end, by="days")[!is.weekend(seq(date_start, date_end, by="days"))]
-missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 or 3?
+missing_chg_cutOff <- date_end # Should this be 2 or 3?
 
 ```
 
