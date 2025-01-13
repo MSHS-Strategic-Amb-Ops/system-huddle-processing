@@ -354,9 +354,9 @@ missing_chg_cutOff <- business_days[length(business_days)-3] # Should this be 2 
 ```{r Scheduling Data Processing, echo = FALSE, warning = FALSE, message = FALSE}
 
 scheduling_data <- tbl(conn1, "MV_DM_PATIENT_ACCESS") %>%
-  left_join(radiology_dep_mapping_tbl %>% select(DEPARTMENT_ID, CLASS),
+  left_join(radiology_dep_mapping_tbl %>% select(DEPARTMENT_ID, DEP_CLASS),
             by = c("DEPARTMENT_ID")) %>%
-  mutate(radiology_check = ifelse((CLASS == "IP_OP" & PATIENT_CLASS %LIKE% '%INPATIENT%') | (CLASS == "IP_OP" & PATIENT_CLASS %LIKE% '%EMERGENCY%'), "Exclude", "Include")) %>%
+  mutate(radiology_check = ifelse((DEP_CLASS == "OP") | (DEP_CLASS == "IP_OP" & PATIENT_CLASS %LIKE% '%OUTPATIENT%') | (DEP_CLASS == "IP_OP" & is.na(PATIENT_CLASS)), "Include", "Exclude")) %>%
   mutate(radiology_check = ifelse(is.na(radiology_check), "Include", radiology_check)) %>%
   filter(radiology_check == "Include") %>%
   filter(!is.na(SITE)) %>%
@@ -364,10 +364,7 @@ scheduling_data <- tbl(conn1, "MV_DM_PATIENT_ACCESS") %>%
   # mutate(Campus = case_when(DEPARTMENT_NAME %in% c("1176 5TH DUBIN MED ONC", "1176 5TH DUBIN SURG ONC") ~ "DUBIN",
   #                           DEPARTMENT_NAME %in% c("1468 MADISON CANCER", "1470 MADISON CANCER CENTER", "10 E 102ND ST INFUSION WHITE BAG", "THERAPEUTIC INF") ~ "RTC",
   #                           TRUE ~ SITE)) %>%
-  filter(!Campus %in% c("MS NOW", "MSHP", "OTHER", "ONCOLOGY")) 
-
-
-  scheduling_data <- scheduling_data %>%
+  filter(!Campus %in% c("MS NOW", "MSHP", "OTHER", "ONCOLOGY")) %>%
   mutate(Appt.DateYear = TO_DATE(CONTACT_DATE),
          Appt.Year = year(CONTACT_DATE),
          Appt.MonNum = month(CONTACT_DATE)) %>%
