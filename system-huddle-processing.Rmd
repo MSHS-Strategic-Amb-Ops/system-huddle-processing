@@ -300,10 +300,10 @@ radiology_dep_mapping_tbl <- tbl(conn1, "RADIOLOGY_DEP_MAPPING")
 
 report_run_date <- Sys.Date()
 
-todays_year <- year(Sys.Date())-1
-prior_year <- year(Sys.Date())-2
+todays_year <- year(Sys.Date())
+prior_year <- year(Sys.Date())-1
 
-date_start <- as.Date(paste0(year(Sys.Date())-2,"-01-01"))
+date_start <- as.Date(paste0(year(Sys.Date())-1,"-01-01"))
 
 # date_data <- access_raw_tbl %>%
 #   filter(DERIVED_STATUS_DESC == "Arrived") %>%
@@ -367,14 +367,21 @@ scheduling_data <- tbl(conn1, "MV_DM_PATIENT_ACCESS") %>%
   filter(!Campus %in% c("MS NOW", "MSHP", "OTHER", "ONCOLOGY")) %>%
   mutate(Appt.DateYear = TO_DATE(CONTACT_DATE),
          Appt.Year = year(CONTACT_DATE),
-         Appt.MonNum = month(CONTACT_DATE)) %>%
+         Appt.MonNum = month(CONTACT_DATE),
+         Appt.Made.DateYear = TO_DATE(APPT_MADE_DATE),
+         Appt.Made.Year = year(APPT_MADE_DATE),
+         Appt.Made.MonNum = month(APPT_MADE_DATE)) %>%
+  mutate(lead_days = CONTACT_DATE - APPT_MADE_DATE) %>%
+  mutate(cancel_lead_days = CONTACT_DATE - APPT_CANC_DATE) %>%
+  mutate(appt_status = ifelse(DERIVED_STATUS_DESC == "Canceled" & cancel_lead_days <=0, "SameDay_Canceled", DERIVED_STATUS_DESC)) %>%
   mutate(Visit.Method  = ifelse(VISIT_METHOD == "IN PERSON", "IN PERSON", "TELEHEALTH"),
-         New.PT3 = ifelse(is.na(LOS_NAME), NA, ifelse(LOS_NAME %like% "INITIAL|NEW", "New", "Established")),
+         New.PT3 = ifelse(LOS_NAME %LIKE% "%INITIAL%" | LOS_NAME %LIKE% "%NEW%", "New", "Established"),
          enc.status = ifelse(ENC_CLOSED_CHARGE_STATUS %in% c("OPEN", "CLOSED BUT COSIGN NEEDED"), 'OPEN', 'CLOSED')) %>%
   mutate(open.days = ifelse(enc.status == "OPEN",
                             TO_DATE(lubridate::today()) - TO_DATE(CONTACT_DATE),
                             TO_DATE(Y_ENC_CLOSE_TIME) - TO_DATE(CONTACT_DATE))) %>%
   mutate(Provider = trim(REGEXP_REPLACE(PROV_NAME_WID, "\\[.*?\\]", "" )))
+
 ```
 
 
@@ -421,6 +428,19 @@ missing_chg_data <- missing_chg_data %>%
   mutate(Appt.MonthYear = paste0(Appt.Month,"-",Appt.Year))
 
 
+missing_chg_data_trend_5days_mshs <- missing_chg_data %>%
+  mutate(Campus = "MSHS: All Sites") %>%
+  group_by(Campus, Appt.Year, Appt.MonNum, Appt.MonthYear, enc.status, clo.5days) %>%
+  summarise(total = sum(total)) %>%
+  group_by(Campus, Appt.Year, Appt.MonthYear) %>%
+  mutate(total.enc = sum(total)) %>%
+  pivot_wider(names_from = clo.5days,
+              values_from = total,
+              values_fill = 0) %>%
+  mutate(clo.5days.perc = round((YES/(total.enc))*100,0)) %>%
+  filter(enc.status == "CLOSED")
+
+
 missing_chg_data_trend_5days <- missing_chg_data %>%
   group_by(Campus, Appt.Year, Appt.MonNum, Appt.MonthYear, enc.status, clo.5days) %>%
   summarise(total = sum(total)) %>%
@@ -432,6 +452,7 @@ missing_chg_data_trend_5days <- missing_chg_data %>%
   mutate(clo.5days.perc = round((YES/(total.enc))*100,0)) %>%
   filter(enc.status == "CLOSED")
 
+missing_chg_data_trend_5days <- bind_rows(missing_chg_data_trend_5days_mshs, missing_chg_data_trend_5days)
 
 missing_chg_data_trend_downtown_5days <- missing_chg_data %>%
   filter(Campus %in% c("MSUS","MSDMG","MSBI")) %>%
