@@ -432,6 +432,21 @@ missing_chg_data_trend_5days <- missing_chg_data %>%
   mutate(clo.5days.perc = round((YES/(total.enc))*100,0)) %>%
   filter(enc.status == "CLOSED")
 
+missing_chg_data_trend_5days_mshs <- missing_chg_data %>%
+  mutate(Campus = "MSHS: All Sites") %>%
+  group_by(Campus, Appt.Year, Appt.MonNum, Appt.MonthYear, enc.status, clo.5days) %>%
+  summarise(total = sum(total)) %>%
+  group_by(Campus, Appt.Year, Appt.MonthYear) %>%
+  mutate(total.enc = sum(total)) %>%
+  pivot_wider(names_from = clo.5days,
+              values_from = total,
+              values_fill = 0) %>%
+  mutate(clo.5days.perc = round((YES/(total.enc))*100,0)) %>%
+  filter(enc.status == "CLOSED")
+
+
+missing_chg_data_trend_5days <- bind_rows(missing_chg_data_trend_5days_mshs, missing_chg_data_trend_5days)
+
 
 missing_chg_data_trend_downtown_5days <- missing_chg_data %>%
   filter(Campus %in% c("MSUS","MSDMG","MSBI")) %>%
